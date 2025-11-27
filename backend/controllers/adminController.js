@@ -1,3 +1,4 @@
+import fs from "fs";
 import validator from "validator";
 import bcrypt from "bcrypt";
 import { v2 as cloudinary } from "cloudinary";
@@ -8,6 +9,8 @@ import jwt from "jsonwebtoken";
 const addDoctor = async (req, res) => {
   // console.log("BODY ->", req.body);
   // console.log("FILE ->", req.file);
+
+  // console.log(req.body);
 
   try {
     const {
@@ -22,6 +25,13 @@ const addDoctor = async (req, res) => {
       address,
     } = req.body;
     const imageFile = req.file;
+
+    if (!imageFile) {
+      return res.json({ success: false, message: "Image not found" });
+    }
+
+    // console.log(`makavosra chalo image dekhtwe hai - `);
+    // console.log(imageFile);
 
     // checking for all data to add doctor
     if (
@@ -55,11 +65,42 @@ const addDoctor = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // console.log(`makavosra kiya mujhe mil gaya ?`);
+
     // upload image to Cloudinary
-    const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
-      resource_type: "image",
-    });
-    const imageURL = imageUpload.secure_url;
+    // upload image to Cloudinary with retry
+    let uploadedImage;
+    const maxRetries = 3;
+
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        console.log(`Cloudinary upload attempt ${i + 1}...`);
+
+        const imageBuffer = fs.readFileSync(imageFile.path);
+        const base64Image = imageBuffer.toString("base64");
+        const dataUri = `data:${imageFile.mimetype};base64,${base64Image}`;
+
+        uploadedImage = await cloudinary.uploader.upload(dataUri, {
+          folder: "doctors",
+          timeout: 180000, // 3 minute ka time out hai ye
+        });
+
+        console.log("Upload SUCCESS:", uploadedImage.secure_url);
+        break; // success mila toh loop se bahar ho jaaunga
+      } catch (err) {
+        console.log(`Attempt ${i + 1} failed:`, err.message || err);
+        if (i === maxRetries - 1) {
+          return res.json({
+            success: false,
+            message: "Image upload failed after 3 attempts",
+          });
+        }
+        // 2 second wait krega bhai, fir start hoga dubara
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+    }
+
+    const imageURL = uploadedImage.secure_url;
 
     const doctorData = {
       name,
@@ -75,13 +116,19 @@ const addDoctor = async (req, res) => {
       date: Date.now(),
     };
 
+    // console.log(`Docktor ki - ${doctorData}`);
+
     const newDoctor = new doctorModel(doctorData);
+
     await newDoctor.save();
 
     res.json({ success: true, message: "Doctor Added to Database" });
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: error.message });
+    res.json({
+      success: false,
+      message: `Doctor add nahi hua error - ${error.message}`,
+    });
   }
 };
 
@@ -94,7 +141,7 @@ const loginAdmin = async (req, res) => {
       password === process.env.ADMIN_PASSWORD
     ) {
       const token = jwt.sign(email + password, process.env.JWT_SECRET);
-      res.json({success:true, token})
+      res.json({ success: true, token });
     } else {
       res.json({ success: false, message: "Invalid Credentials" });
     }
@@ -104,4 +151,16 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-export { addDoctor, loginAdmin };
+// API to get all doctors list for admin panel
+
+const allDoctors = async (req, res) => {
+  try {
+    const doctors = await doctorModel.find({}).select("-password");
+    res.json({ success: true, doctors });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export { addDoctor, loginAdmin, allDoctors };
