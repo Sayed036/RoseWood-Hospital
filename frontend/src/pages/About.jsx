@@ -21,7 +21,7 @@ function About() {
         {/* right side for details */}
         <div className="flex flex-col justify-center gap-6 md:w-2/4 text-sm text-gray-600">
           <p>
-            WoodLand Hospital is committed to delivering exceptional healthcare
+            RoseWood Hospital is committed to delivering exceptional healthcare
             with compassion, precision, and trust. Our mission is to provide
             world-class medical services supported by advanced technology,
             modern infrastructure, and a team of highly skilled doctors and
@@ -30,7 +30,7 @@ function About() {
           </p>
 
           <p>
-            At WoodLand Hospital, we believe that great healthcare goes beyond
+            At RoseWood Hospital, we believe that great healthcare goes beyond
             treatment—it begins with understanding. Our compassionate staff,
             experienced doctors, and specialized departments work together to
             offer personalized care tailored to every patient’s needs.
@@ -39,7 +39,7 @@ function About() {
           <b className="text-gray-800">Our Vision</b>
 
           <p>
-            At WoodLand Hospital, our vision is to create a healthier future by
+            At RoseWood Hospital, our vision is to create a healthier future by
             making advanced, compassionate, and accessible healthcare available
             to every individual. We strive to become a trusted center of medical
             excellence where innovation meets empathy.

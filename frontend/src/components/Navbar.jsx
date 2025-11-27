@@ -1,15 +1,24 @@
 import { assets } from "../assets/assets";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AppContext } from "../context/AppContext";
 
 function Navbar() {
   const navigate = useNavigate();
+
+  const {token, setToken, userData} = useContext(AppContext)
+
   const [showMenu, setShowMenu] = useState(false);
-  const [token, setToken] = useState(true);
+  // const [token, setToken] = useState(true);
 
   // drop down option in profile pic
   const [showDropdown, setShowDropdown] = useState(false);
+
+  const logOut = () => {
+    setToken(false)
+    localStorage.removeItem('token')
+  }
 
   return (
     <nav
@@ -46,12 +55,12 @@ function Navbar() {
       </ul>
 
       <div className="flex items-center gap-4">
-        {token ? (
+        {token && userData ? (
           <div
             className="flex items-center gap-2 cursor-pointer group relative"
             onClick={() => setShowDropdown(!showDropdown)} // mobile toggle
           >
-            <img className="w-8 rounded-full" src={assets.profile_pic} alt="" />
+            <img className="w-8 h-8 rounded-full object-cover" src={userData.image} alt="" />
             <img className="w-2.5" src={assets.dropdown_icon} alt="" />
 
             {/*------------ DROPDOWN ---------------*/}
@@ -84,9 +93,9 @@ function Navbar() {
                 </p>
 
                 <p
-                  onClick={() => {
+                  onClick={() => { logOut();
                     setShowDropdown(false);
-                    setToken(false);
+                    // setToken(false);
                   }}
                   className="hover:text-black cursor-pointer"
                 >

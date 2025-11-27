@@ -11,9 +11,14 @@ import Appointment from "./pages/Appointment.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+
 function App() {
   return (
     <div className="mx-4 sm:mx-[10%]">
+      <ToastContainer theme="colored"/>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />

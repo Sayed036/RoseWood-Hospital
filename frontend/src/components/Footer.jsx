@@ -8,7 +8,7 @@ function Footer() {
         {/* Left Section */}
         <div>
             <img className='mb-5 w-40' src={assets.logo} alt="" />
-            <p className='w-full md:w-2/3 text-gray-600 leading-6'>Woodlands Multispeciality Hospital Limited is a part of the US $7 billion asset base and US $4 billion revenue RP-Sanjiv Goenka Group, one of India's fastest growing conglomerates with a significant global presence.</p>
+            <p className='w-full md:w-2/3 text-gray-600 leading-6'>RoseWoods Multispeciality Hospital Limited is a part of the US $7 billion asset base and US $4 billion revenue RP-Sayed Hossain Group, one of India's fastest growing conglomerates with a significant global presence.</p>
         </div>
 
         {/* Center Section */}
@@ -34,7 +34,7 @@ function Footer() {
         {/* Copy right text */}
       <div>
         <hr />
-        <p className='py-5 text-sm text-center'>Copyright 2025@ Woodland - All Right Reserved.</p>
+        <p className='py-5 text-sm text-center'>Copyright 2025@ RoseWood - All Right Reserved.</p>
       </div>
     </div>
   )

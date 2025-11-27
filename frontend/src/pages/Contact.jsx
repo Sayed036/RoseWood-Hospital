@@ -25,7 +25,7 @@ function Contact() {
           <p className="text-gray-500">
             Tel: (365) 633-0635 <br /> soulf032@gmail.com{" "}
           </p>
-          <p className="font-semibold text-lg text-gray-600">Careers at WoodLand</p>
+          <p className="font-semibold text-lg text-gray-600">Careers at RoseWood</p>
           <p className="text-gray-500">Learn more about our teams and job openings.</p>
           <button className="border border-black px-8 py-4 text-sm hover:bg-[#b03053] hover:text-white transition-all duration-300">Explore Jobs</button>
         </div>
