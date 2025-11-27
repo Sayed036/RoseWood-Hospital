@@ -111,7 +111,7 @@ function Navbar() {
             }}
             className="bg-[#b03053] text-white px-8 py-3 rounded-full hidden md:block"
           >
-            Create account
+            Create/Login account
           </button>
         )}
 

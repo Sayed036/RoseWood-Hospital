@@ -19,7 +19,7 @@ const AppContextProvider = (props) => {
   // userProfile update krne ka state
   const [userData, setUserData] = useState(false);
 
-  const getDoctorData = async () => {
+  const getDoctorsData = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/doctor/list");
       if (data.success) {
@@ -52,7 +52,7 @@ const AppContextProvider = (props) => {
   };
 
   const value = {
-    doctors,
+    doctors, getDoctorsData,
     currencySymbol,
     token,
     setToken,
@@ -63,14 +63,14 @@ const AppContextProvider = (props) => {
   };
 
   useEffect(() => {
-    getDoctorData();
+    getDoctorsData();
   }, []);
 
   useEffect(() => {
     if (token) {
       loadUserProfileData();
     } else {
-      setUserdata(false);
+      setUserData(false);
     }
   }, [token]);
 
