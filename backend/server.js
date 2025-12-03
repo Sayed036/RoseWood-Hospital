@@ -1,6 +1,7 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import connectDB from "./configs/mongodb.js";
 import connectCloudinary from "./configs/Cloudinary.js";
 import adminRouter from "./routes/adminRoute.js";
@@ -9,7 +10,6 @@ import userRouter from "./routes/userRoute.js";
 
 // App Config
 const app = express();
-dotenv.config();
 const port = process.env.PORT || 8000;
 connectDB();
 connectCloudinary();
