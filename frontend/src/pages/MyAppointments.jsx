@@ -17,7 +17,7 @@ const MyAppointments = () => {
 
       if (data.success) {
         setAppointments(data.appointments.reverse());
-        console.log("bhai appointment list mil gya :",data.appointments)
+        // console.log("bhai appointment list mil gya :",data.appointments)
       } else {
         console.error("Failed to fetch appointments:", data.message);
       }
