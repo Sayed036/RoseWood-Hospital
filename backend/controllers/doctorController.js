@@ -84,19 +84,32 @@ const appointmentComplete = async (req, res) => {
     }
 
     const appointmentData = await appointmentModel.findById(appointmentId);
-    if(appointmentData && appointmentData.docId === docId){
-      await appointmentModel.findByIdAndUpdate(appointmentId, {isCompleted: true});
-      res.json({success: true, message: "Appointment completed"});
-    } else{
-      res.json({success: false, message: "Marked Failed"});
 
+    if (!appointmentData) {
+      return res.json({ success: false, message: "Appointment not found" });
     }
 
+    // FIXED COMPARISON (ObjectId vs string)
+    if (appointmentData.docId.toString() !== docId.toString()) {
+      return res.json({ success: false, message: "Not allowed" });
+    }
+
+    // PREVENT completing cancelled appointments
+    if (appointmentData.cancelled) {
+      return res.json({ success: false, message: "Cannot complete a cancelled appointment" });
+    }
+
+    await appointmentModel.findByIdAndUpdate(appointmentId, {
+      isCompleted: true
+    });
+
+    res.json({ success: true, message: "Appointment completed" });
+
   } catch (error) {
-    console.log("Mark appointment me problem(doc Panel) hai vaii(catch) : ",error);
+    console.log("Complete Appointment Error:", error);
     res.json({ success: false, message: error.message });
   }
-}
+};
 
 
 // API to cancel appointment as completed by doctor(doctor panel)
@@ -110,18 +123,71 @@ const appointmentCancel = async (req, res) => {
     }
 
     const appointmentData = await appointmentModel.findById(appointmentId);
-    if(appointmentData && appointmentData.docId === docId){
-      await appointmentModel.findByIdAndUpdate(appointmentId, {cancelled: true});
-      res.json({success: true, message: "Appointment Cancelled"});
-    } else{
-      res.json({success: false, message: "Cancellation Failed"});
 
+    if (!appointmentData) {
+      return res.json({ success: false, message: "Appointment not found" });
     }
 
+    
+    if (appointmentData.docId.toString() !== docId.toString()) {
+      return res.json({ success: false, message: "Not allowed" });
+    }
+
+    // Do not cancel completed appointments
+    if (appointmentData.isCompleted) {
+      return res.json({ success: false, message: "Cannot cancel a completed appointment" });
+    }
+
+    await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true });
+
+    res.json({ success: true, message: "Appointment Cancelled" });
+
   } catch (error) {
-    console.log("Cancel appointment me problem(doc Panel) hai vaii(catch) : ",error);
+    console.log("Cancel Appointment Error:", error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+
+
+// API to get dahsboard data for doctor panel
+const doctorDashboard = async (req, res) => {
+  try {
+    const docId = req.docId;
+
+    if (!docId) {
+      return res.status(401).json({ success: false, message: "Doctor not authenticated" });
+    }
+
+    const appointments = await appointmentModel.find({docId})
+
+    let earnings = 0
+
+    appointments.map( (item)=> {
+      if(item.isCompleted || item.payment){
+        earnings += item.amount
+      }
+    } )
+
+    let patients = []
+    appointments.map( (item) => {
+      if(!patients.includes(item.userId)){
+        patients.push(item.userId)
+      }
+    })
+
+    const dashData = {
+      earnings,
+      appointments: appointments.length,
+      patients: patients.length,
+      latestAppointments: appointments.reverse().slice(0,5)
+    }
+
+    res.json({success: true, dashData})
+  } catch (error) {
+    console.log("Dashboard me problem(doc Panel) hai vaii(catch) : ",error);
     res.json({ success: false, message: error.message });
   }
 }
 
-export { checkAvailability, doctorList, loginDoctor, appointmentsDoctor, appointmentComplete, appointmentCancel };
+export { checkAvailability, doctorList, loginDoctor, appointmentsDoctor, appointmentComplete, appointmentCancel, doctorDashboard };

@@ -11,6 +11,7 @@ const DoctorContextProvider = (props) => {
 
   const [dToken, setDToken] = useState(localStorage.getItem('dToken') ? localStorage.getItem('dToken') : '')
   const [appointments, setAppointments] = useState([])
+  const [dashData, setDashData] = useState(false)
 
   const getAppointments = async () => {
     try {
@@ -18,7 +19,7 @@ const DoctorContextProvider = (props) => {
 
       if(data.success){
         setAppointments(data.appointments)
-        console.log("vaii sara appointment mil gya : ",data.appointments)
+        // console.log("vaii sara appointment mil gya : ",data.appointments)
       } else{
         toast.error(data.message)
       }
@@ -31,35 +32,62 @@ const DoctorContextProvider = (props) => {
 
 
   // mark appointement as complete
-  const completeAppointment = async(appointmentId) => {
-    try {
-      const {data} = await axios.post(backendUrl + '/api/doctor/complete-appointment', {appointmentId}, {headers: {dToken}} )
+  const completeAppointment = async (appointmentId) => {
+  try {
+    const { data } = await axios.post(
+      backendUrl + "/api/doctor/complete-appointment",
+      { appointmentId },
+      { headers: { dToken } }
+    );
 
-      if(data.success){
-        toast.success(data.message)
-        getAppointments()
-      } else{
-        toast.error(data.message)
-      }
-
-    } catch (error) {
-      console.log(error)
-      toast.error(error.message)
+    if (data.success) {
+      toast.success(data.message);
+      getAppointments(); //appointment table update
+      getDashData();     //dashboard update
+    } else {
+      toast.error(data.message);
     }
+  } catch (error) {
+    console.log(error);
+    toast.error(error.message);
   }
+};
+
 
   // cancel appointement
-  const cancelAppointment = async(appointmentId) => {
-    try {
-      const {data} = await axios.post(backendUrl + '/api/doctor/cancel-appointment', {appointmentId}, {headers: {dToken}} )
+  const cancelAppointment = async (appointmentId) => {
+  try {
+    const { data } = await axios.post(
+      backendUrl + "/api/doctor/cancel-appointment",
+      { appointmentId },
+      { headers: { dToken } }
+    );
 
+    if (data.success) {
+      toast.success(data.message);
+      getAppointments(); // appointment list update
+      getDashData();     //dashboard instant update
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    console.log(error);
+    toast.error(error.message);
+  }
+};
+
+
+  // dashBoard data for doctor panel
+  const getDashData = async () => {
+    try {
+      const {data} = await axios.get(backendUrl + '/api/doctor/dashboard', {headers: {dToken}} )
+      
       if(data.success){
-        toast.success(data.message)
-        getAppointments()
+        setDashData(data.dashData)
+        // console.log("vaii dashData mil gya : ",data.dashData)
       } else{
         toast.error(data.message)
       }
-
     } catch (error) {
       console.log(error)
       toast.error(error.message)
@@ -74,7 +102,8 @@ const DoctorContextProvider = (props) => {
     setAppointments,
     getAppointments,
     completeAppointment,
-    cancelAppointment
+    cancelAppointment,
+    dashData, setDashData, getDashData
   };
 
   return (
